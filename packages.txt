@@ -1,0 +1,14 @@
+adduser
+apt-utils
+autoconf
+automake
+curl
+git-core
+libtool
+pkg-config
+python
+software-properties-common
+sudo
+supervisor
+tcpdump
+wget

@@ -1,0 +1,13 @@
+bottle
+chardet
+django
+django-ratelimit
+dnspython
+jinja2
+jsbeautifier
+mitmproxy
+nose
+pefile
+pygal
+pymongo
+sqlalchemy
