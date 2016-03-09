@@ -97,7 +97,7 @@ RUN wget http://libvirt.org/sources/libvirt-$LIBVIRT.tar.gz &&\
 RUN apt-get install -y tcpdump &&\
     chmod +s /usr/sbin/tcpdump &&\
     apt-get install -y libcap2-bin &&\
-    setcap cap_net_raw,cap_net_admin=eip `readlink -f \`which node\``
+    setcap cap_net_raw,cap_net_admin=eip `readlink -f \`which tcpdump\``
 
 # Fetch and install Suricata
 RUN add-apt-repository ppa:oisf/suricata-beta &&\
