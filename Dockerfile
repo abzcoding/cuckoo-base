@@ -94,9 +94,9 @@ RUN wget http://libvirt.org/sources/libvirt-$LIBVIRT.tar.gz &&\
     rm -rf /tmp/docker/build/*
 
 # Install TCPDUMP and configure it for non-admin users
-RUN apt-get install tcpdump &&\
+RUN apt-get install -y tcpdump &&\
     chmod +s /usr/sbin/tcpdump &&\
-    apt-get install libcap2-bin &&\
+    apt-get install -y libcap2-bin &&\
     setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
 
 # Fetch and install Suricata
