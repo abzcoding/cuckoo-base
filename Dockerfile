@@ -128,7 +128,7 @@ RUN chmod +x /usr/sbin/tcpdump &&\
     groupadd tcpdump &&\
     addgroup cuckoo tcpdump &&\
     chmod 0750 /usr/sbin/tcpdump &&\
-    setcap "CAP_NET_RAW+eip" /usr/sbin/tcpdump
+    setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
 
 # Clean up unnecessary files
 RUN xargs apt-get purge -y --auto-remove < /tmp/builddep.txt &&\
