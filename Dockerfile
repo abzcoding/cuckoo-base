@@ -123,10 +123,11 @@ RUN chmod -R =rwX,g=rwX,o=X /usr/var/malheur/
 RUN chown cuckoo:cuckoo /etc/suricata/suricata-cuckoo.yaml
 
 # Install TCPDUMP and configure it for non-admin users
-RUN chmod +x /usr/sbin/tcpdump &&\
+RUN chmod +s /usr/sbin/tcpdump &&\
     apt-get install -y libcap2-bin &&\
     groupadd tcpdump &&\
     addgroup cuckoo tcpdump &&\
+    chgrp tcpdump /usr/sbin/tcpdump &&\
     chmod 0750 /usr/sbin/tcpdump &&\
     setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
 
