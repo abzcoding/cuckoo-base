@@ -37,6 +37,16 @@ RUN wget https://github.com/plusvic/yara/archive/v$YARA.tar.gz &&\
     python setup.py install &&\
     rm -rf /tmp/docker/build/*
 
+# Build and install Jansson
+RUN git clone https://github.com/akheron/jansson &&\
+    cd jansson &&\
+    autoreconf -vi --force &&\
+    ./configure &&\
+    make &&\
+    make check &&\
+    make install &&\
+    rm -rf /tmp/docker/build/*
+
 # Build and install ssdeep, Install pydeep, which is used to generate fuzzy hashes
 RUN wget http://www.mirrorservice.org/sites/dl.sourceforge.net/pub/sourceforge/s/ss/ssdeep/$SSDEEP/$SSDEEP.tar.gz &&\
     tar xzf $SSDEEP.tar.gz &&\
