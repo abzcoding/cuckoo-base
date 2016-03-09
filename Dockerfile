@@ -93,12 +93,6 @@ RUN wget http://libvirt.org/sources/libvirt-$LIBVIRT.tar.gz &&\
     ldconfig &&\
     rm -rf /tmp/docker/build/*
 
-# Install TCPDUMP and configure it for non-admin users
-RUN chmod +x /usr/sbin/tcpdump &&\
-    apt-get install -y libcap2-bin &&\
-    ls -l /usr/sbin/tcpdump &&\
-    setcap cap_net_raw,cap_net_admin=/usr/sbin/tcpdump
-
 # Fetch and install Suricata
 RUN add-apt-repository ppa:oisf/suricata-beta &&\
     apt-get update &&\
@@ -127,6 +121,14 @@ RUN adduser cuckoo --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disable
 RUN chown -R cuckoo:cuckoo /usr/var/malheur/
 RUN chmod -R =rwX,g=rwX,o=X /usr/var/malheur/
 RUN chown cuckoo:cuckoo /etc/suricata/suricata-cuckoo.yaml
+
+# Install TCPDUMP and configure it for non-admin users
+RUN chmod +x /usr/sbin/tcpdump &&\
+    apt-get install -y libcap2-bin &&\
+    groupadd tcpdump &&\
+    addgroup cuckoo tcpdump &&\
+    chmod 0750 /usr/sbin/tcpdump &&\
+    setcap "CAP_NET_RAW+eip" /usr/sbin/tcpdump
 
 # Clean up unnecessary files
 RUN xargs apt-get purge -y --auto-remove < /tmp/builddep.txt &&\
