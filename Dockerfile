@@ -34,7 +34,8 @@ RUN wget https://github.com/plusvic/yara/archive/v$YARA.tar.gz &&\
     make install &&\
     cd yara-python &&\
     python setup.py build &&\
-    python setup.py install 
+    python setup.py install &&\
+    rm -rf /tmp/docker/build/*
 
 # Build and install ssdeep, Install pydeep, which is used to generate fuzzy hashes
 RUN wget http://www.mirrorservice.org/sites/dl.sourceforge.net/pub/sourceforge/s/ss/ssdeep/$SSDEEP/$SSDEEP.tar.gz &&\
@@ -47,7 +48,8 @@ RUN wget http://www.mirrorservice.org/sites/dl.sourceforge.net/pub/sourceforge/s
     git clone https://github.com/kbandla/pydeep.git &&\
     cd pydeep &&\
     python setup.py build &&\
-    python setup.py install
+    python setup.py install &&\
+    rm -rf /tmp/docker/build/*
 
 # Install Malheur, which is used for malware behavior correlation
 RUN git clone https://github.com/rieck/malheur.git &&\
@@ -55,14 +57,16 @@ RUN git clone https://github.com/rieck/malheur.git &&\
     ./bootstrap &&\
     ./configure --prefix=/usr &&\
     make &&\
-    make install
+    make install &&\
+    rm -rf /tmp/docker/build/*
 
 # Build and Install the Volatility memory analysis system
 RUN wget https://github.com/volatilityfoundation/volatility/archive/$VOLATILITY.tar.gz &&\
     tar xzf $VOLATILITY.tar.gz &&\
     cd volatility-$VOLATILITY &&\
     python setup.py build &&\
-    python setup.py install
+    python setup.py install &&\
+    rm -rf /tmp/docker/build/*
 
 # Build and install libvirt with ESX driver
 RUN wget http://libvirt.org/sources/libvirt-$LIBVIRT.tar.gz &&\
@@ -76,7 +80,8 @@ RUN wget http://libvirt.org/sources/libvirt-$LIBVIRT.tar.gz &&\
     git checkout -b v$LIBVIRT tags/v$LIBVIRT &&\
     python setup.py build &&\
     python setup.py install &&\
-    ldconfig
+    ldconfig &&\
+    rm -rf /tmp/docker/build/*
 
 # Fetch and install Suricata
 RUN add-apt-repository ppa:oisf/suricata-beta &&\
@@ -88,7 +93,8 @@ RUN add-apt-repository ppa:oisf/suricata-beta &&\
 RUN svn checkout http://pyv8.googlecode.com/svn/trunk/ pyv8-read-only &&\
     cd pyv8-read-only &&\
     python setup.py build &&\
-    python setup.py install
+    python setup.py install &&\
+    rm -rf /tmp/docker/build/*
 
 # Configure Suricata to capture any file found over HTTP
 COPY suricata/rules/cuckoo.rules /etc/suricata/rules/cuckoo.rules
