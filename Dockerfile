@@ -26,6 +26,14 @@ RUN buildDeps='curl \
                libxml2-dev \
                libxslt1-dev \
                libyaml-dev \
+               libtool \
+               libpcap-dev \
+               libnet1-dev \
+               libpcre3-dev \
+               zlib1g \
+               zlib1g-dev \
+               libmagic-dev \
+               libcap-ng-dev \
                make \
                autoconf \
                automake \
@@ -41,14 +49,13 @@ RUN buildDeps='curl \
                         adduser \
                         apt-utils \
                         git-core \
-                        libtool \
                         pkg-config \
                         python \
                         software-properties-common \
                         sudo \
                         supervisor \
                         tcpdump --no-install-recommends \
- && echo "Installing Python Requirements ... " \
+ && echo "Installing Python Requirements " \
  && pip install bottle \
                 chardet \
                 django \
@@ -62,7 +69,7 @@ RUN buildDeps='curl \
                 pygal \
                 pymongo \
                 sqlalchemy \
- && echo "Build and install yara [$YARA] ... " \
+ && echo "Build and install yara [$YARA] " \
  && wget https://github.com/plusvic/yara/archive/v$YARA.tar.gz \
  && tar xzf v$YARA.tar.gz \
  && cd yara-$YARA \
@@ -74,7 +81,7 @@ RUN buildDeps='curl \
  && python setup.py build \
  && python setup.py install \
  && cd \
- && echo "Build and install Jansson..." \
+ && echo "Build and install Jansson" \
  && git clone https://github.com/akheron/jansson \
  && cd jansson \
  && autoreconf -vi --force \
@@ -129,11 +136,11 @@ RUN buildDeps='curl \
  && wget http://www.openinfosecfoundation.org/download/suricata-3.0RC3.tar.gz \
  && tar -zxf suricata-3.0RC3.tar.gz \
  && cd suricata-3.0RC3 \
- && ./configure --enable-nfqueue --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+ && ./configure \
  && make \
  && make install \
  && cd \
- && echo "Install the PyV8 JavaScript engine, used for analyzing malicious JavaScript.." \
+ && echo "Install the PyV8 JavaScript engine, used for analyzing malicious JavaScript" \
  && svn checkout http://pyv8.googlecode.com/svn/trunk/ pyv8-read-only \
  && cd pyv8-read-only \
  && python setup.py build \
