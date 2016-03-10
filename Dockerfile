@@ -26,11 +26,9 @@ RUN buildDeps='curl \
                libxml2-dev \
                libxslt1-dev \
                libyaml-dev \
-               libtool \
                libpcap-dev \
                libnet1-dev \
                libpcre3-dev \
-               zlib1g \
                zlib1g-dev \
                libmagic-dev \
                libcap-ng-dev \
@@ -47,6 +45,7 @@ RUN buildDeps='curl \
  && apt-get update -qq \
  && apt-get install -yq $buildDeps \
                         cron \
+                        libtool \
                         adduser \
                         apt-utils \
                         git-core \
@@ -55,7 +54,8 @@ RUN buildDeps='curl \
                         software-properties-common \
                         sudo \
                         supervisor \
-                        tcpdump --no-install-recommends \
+                        tcpdump \
+                        zlib1g --no-install-recommends \
  && echo "Installing Python Requirements " \
  && pip install bottle \
                 chardet \
