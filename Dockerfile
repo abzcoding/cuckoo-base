@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM debian:latest
 MAINTAINER Abouzar Parvan <abzcoding@gmail.com>
 
 ENV YARA 3.4.0
@@ -8,130 +8,146 @@ ENV LIBVIRT 1.3.1
 
 WORKDIR /tmp/docker/build
 
-COPY builddep.txt /tmp/
-COPY packages.txt /tmp/
-COPY requirements.txt /tmp/
-
-# Install the build dependencies
-RUN apt-get update &&\
-    xargs apt-get install -y < /tmp/builddep.txt
-
-# Install the cuckoo dependencies
-RUN xargs apt-get install -y < /tmp/packages.txt &&\
-    rm /tmp/packages.txt
-
-# Install Python requirements
-RUN pip install -r /tmp/requirements.txt &&\
-    rm /tmp/requirements.txt
-
-# Build and install yara
-RUN wget https://github.com/plusvic/yara/archive/v$YARA.tar.gz &&\
-    tar xzf v$YARA.tar.gz &&\
-    cd yara-$YARA &&\
-    ./bootstrap.sh &&\
-    ./configure --with-crypto --enable-cuckoo --enable-magic &&\
-    make &&\
-    make install &&\
-    cd yara-python &&\
-    python setup.py build &&\
-    python setup.py install &&\
-    rm -rf /tmp/docker/build/*
-
-# Build and install Jansson
-RUN git clone https://github.com/akheron/jansson &&\
-    cd jansson &&\
-    autoreconf -vi --force &&\
-    ./configure &&\
-    make &&\
-    make check &&\
-    make install &&\
-    rm -rf /tmp/docker/build/*
-
-# Build and install ssdeep, Install pydeep, which is used to generate fuzzy hashes
-RUN wget http://www.mirrorservice.org/sites/dl.sourceforge.net/pub/sourceforge/s/ss/ssdeep/$SSDEEP/$SSDEEP.tar.gz &&\
-    tar xzf $SSDEEP.tar.gz &&\
-    cd $SSDEEP &&\
-    ./bootstrap &&\
-    ./configure &&\
-    make &&\
-    make install &&\
-    git clone https://github.com/kbandla/pydeep.git &&\
-    cd pydeep &&\
-    python setup.py build &&\
-    python setup.py install &&\
-    rm -rf /tmp/docker/build/*
-
-# Install Malheur, which is used for malware behavior correlation
-RUN git clone https://github.com/rieck/malheur.git &&\
-    cd malheur &&\
-    ./bootstrap &&\
-    ./configure --prefix=/usr &&\
-    make &&\
-    make install &&\
-    rm -rf /tmp/docker/build/*
-
-# Build and Install the Volatility memory analysis system
-RUN wget https://github.com/volatilityfoundation/volatility/archive/$VOLATILITY.tar.gz &&\
-    tar xzf $VOLATILITY.tar.gz &&\
-    cd volatility-$VOLATILITY &&\
-    python setup.py build &&\
-    python setup.py install &&\
-    rm -rf /tmp/docker/build/*
-
-# Build and install libvirt with ESX driver
-RUN wget http://libvirt.org/sources/libvirt-$LIBVIRT.tar.gz &&\
-    tar xzf libvirt-$LIBVIRT.tar.gz &&\
-    cd libvirt-$LIBVIRT &&\
-    ./configure --with-esx &&\
-    make &&\
-    make install &&\
-    git clone git://libvirt.org/libvirt-python.git &&\
-    cd libvirt-python &&\
-    git checkout -b v$LIBVIRT tags/v$LIBVIRT &&\
-    python setup.py build &&\
-    python setup.py install &&\
-    ldconfig &&\
-    rm -rf /tmp/docker/build/*
-
-# Fetch and install Suricata
-RUN add-apt-repository ppa:oisf/suricata-beta &&\
-    apt-get update &&\
-    apt-get install -y libhtp1 suricata
-
-# Install the PyV8 JavaScript engine, used for analyzing malicious JavaScript
-# COPY servers /root/.subversion/servers #if you want to use a proxy for getting code from googlecode
-RUN svn checkout http://pyv8.googlecode.com/svn/trunk/ pyv8-read-only &&\
-    cd pyv8-read-only &&\
-    python setup.py build &&\
-    python setup.py install &&\
-    rm -rf /tmp/docker/build/*
+RUN buildDeps='libboost-all-dev \
+               libconfig-dev \
+               libcurl4-openssl-dev \
+               libcurlpp-dev \
+               libdevmapper-dev \
+               libffi-dev \
+               libjansson-dev \
+               libjpeg8-dev \
+               libmagic-dev \
+               libnl-3-dev \
+               libnl-route-3-dev \
+               libpciaccess-dev \
+               libssl-dev \
+               libxml2-dev \
+               libxslt1-dev \
+               numactl \
+               python-dev \
+               python-pip \
+               subversion \
+               zlib1g-dev' \
+ && set -x \
+ && apt-get update -qq \
+ && apt-get install -yq $buildDeps \
+                        adduser \
+                        apt-utils \
+                        autoconf \
+                        automake \
+                        curl \
+                        git-core \
+                        libtool \
+                        pkg-config \
+                        python \
+                        software-properties-common \
+                        sudo \
+                        supervisor \
+                        tcpdump \
+                        wget --no-install-recommends \
+ && echo "Installing Python Requirements ... " \
+ && pip install bottle \
+                chardet \
+                django \
+                django-ratelimit \
+                dnspython \
+                jinja2 \
+                jsbeautifier \
+                mitmproxy \
+                nose \
+                pefile \
+                pygal \
+                pymongo \
+                sqlalchemy \
+ && echo "Build and install yara [$YARA] ... " \
+ && wget https://github.com/plusvic/yara/archive/v$YARA.tar.gz \
+ && tar xzf v$YARA.tar.gz \
+ && cd yara-$YARA \
+ && ./bootstrap.sh \
+ && ./configure --with-crypto --enable-cuckoo --enable-magic \
+ && make \
+ && make install \
+ && cd yara-python \
+ && python setup.py build \
+ && python setup.py install \
+ && cd \
+ && echo "Build and install Jansson..." \
+ && git clone https://github.com/akheron/jansson \
+ && cd jansson \
+ && autoreconf -vi --force \
+ && ./configure \
+ && make \
+ && make check \
+ && make install \
+ && cd \
+ && echo "Build and install ssdeep, Install pydeep, which is used to generate fuzzy hashes " \
+ && wget http://www.mirrorservice.org/sites/dl.sourceforge.net/pub/sourceforge/s/ss/ssdeep/$SSDEEP/$SSDEEP.tar.gz \
+ && tar xzf $SSDEEP.tar.gz \
+ && cd $SSDEEP \
+ && ./bootstrap \
+ && ./configure \
+ && make \
+ && make install \
+ && git clone https://github.com/kbandla/pydeep.git \
+ && cd pydeep \
+ && python setup.py build \
+ && python setup.py install \
+ && cd \
+ && echo "Install Malheur, which is used for malware behavior correlation" \
+ && git clone https://github.com/rieck/malheur.git \
+ && cd malheur \
+ && ./bootstrap \
+ && ./configure --prefix=/usr \
+ && make \
+ && make install \
+ && cd \
+ && echo "Build and Install the Volatility memory analysis system" \
+ && wget https://github.com/volatilityfoundation/volatility/archive/$VOLATILITY.tar.gz \
+ && tar xzf $VOLATILITY.tar.gz \
+ && cd volatility-$VOLATILITY \
+ && python setup.py build \
+ && python setup.py install \
+ && cd \
+ && echo "Build and install libvirt with ESX driver" \
+ && wget http://libvirt.org/sources/libvirt-$LIBVIRT.tar.gz \
+ && tar xzf libvirt-$LIBVIRT.tar.gz \
+ && cd libvirt-$LIBVIRT \
+ && ./configure --with-esx \
+ && make \
+ && make install \
+ && git clone git://libvirt.org/libvirt-python.git \
+ && cd libvirt-python \
+ && git checkout -b v$LIBVIRT tags/v$LIBVIRT \
+ && python setup.py build \
+ && python setup.py install \
+ && ldconfig \
+ && cd \
+ && echo "Fetch and install Suricata"
+ && add-apt-repository ppa:oisf/suricata-beta \
+ && apt-get update \
+ && apt-get install -y libhtp1 suricata --no-install-recommends \
+ && cd \
+ && echo "Install the PyV8 JavaScript engine, used for analyzing malicious JavaScript.." \
+ && svn checkout http://pyv8.googlecode.com/svn/trunk/ pyv8-read-only \
+ && cd pyv8-read-only \
+ && python setup.py build \
+ && python setup.py install \
+ && cd \
+ && echo "Download etupdate to update Emerging Threat's Open IDS rules" \
+ && git clone https://github.com/seanthegeek/etupdate.git \
+ && cp etupdate/etupdate /usr/sbin/etupdate \
+ && /usr/sbin/etupdate -V \
+ && echo "42 * * * * /usr/sbin/etupdate" >> /var/spool/cron/crontabs/root \
+ && echo "Create Cuckoo user" \
+ && adduser cuckoo --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password \
+ && chown -R cuckoo:cuckoo /usr/var/malheur/ \
+ && chmod -R =rwX,g=rwX,o=X /usr/var/malheur/ \
+ && chown cuckoo:cuckoo /etc/suricata/suricata-cuckoo.yaml \
+ && echo "Clean up unnecessary files" \
+ && apt-get purge -y --auto-remove $buildDeps \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Configure Suricata to capture any file found over HTTP
 COPY suricata/rules/cuckoo.rules /etc/suricata/rules/cuckoo.rules
 COPY suricata/suricata-cuckoo.yaml /etc/suricata/suricata-cuckoo.yaml
-
-# Download etupdate to update Emerging Threat's Open IDS rules
-RUN git clone https://github.com/seanthegeek/etupdate.git &&\
-    cp etupdate/etupdate /usr/sbin/etupdate &&\
-    /usr/sbin/etupdate -V
-RUN echo "42 * * * * /usr/sbin/etupdate" >> /var/spool/cron/crontabs/root
-
-# Create Cuckoo user
-RUN adduser cuckoo --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
-RUN chown -R cuckoo:cuckoo /usr/var/malheur/
-RUN chmod -R =rwX,g=rwX,o=X /usr/var/malheur/
-RUN chown cuckoo:cuckoo /etc/suricata/suricata-cuckoo.yaml
-
-# Install TCPDUMP and configure it for non-admin users
-RUN chmod +s /usr/sbin/tcpdump &&\
-    apt-get install -y libcap2-bin &&\
-    groupadd tcpdump &&\
-    addgroup cuckoo tcpdump &&\
-    chgrp tcpdump /usr/sbin/tcpdump &&\
-    chmod 0750 /usr/sbin/tcpdump &&\
-    setcap cap_net_raw,cap_net_admin=eip /usr/sbin/tcpdump
-
-# Clean up unnecessary files
-RUN xargs apt-get purge -y --auto-remove < /tmp/builddep.txt &&\
-    apt-get clean &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
