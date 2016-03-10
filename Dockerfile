@@ -8,7 +8,8 @@ ENV LIBVIRT 1.3.1
 
 WORKDIR /tmp/docker/build
 
-RUN buildDeps='libboost-all-dev \
+RUN buildDeps='curl \
+               libboost-all-dev \
                libconfig-dev \
                libcurl4-openssl-dev \
                libcurlpp-dev \
@@ -23,19 +24,20 @@ RUN buildDeps='libboost-all-dev \
                libssl-dev \
                libxml2-dev \
                libxslt1-dev \
+               make \
+               autoconf \
+               automake \
                numactl \
                python-dev \
                python-pip \
                subversion \
+               wget \
                zlib1g-dev' \
  && set -x \
  && apt-get update -qq \
  && apt-get install -yq $buildDeps \
                         adduser \
                         apt-utils \
-                        autoconf \
-                        automake \
-                        curl \
                         git-core \
                         libtool \
                         pkg-config \
@@ -43,8 +45,7 @@ RUN buildDeps='libboost-all-dev \
                         software-properties-common \
                         sudo \
                         supervisor \
-                        tcpdump \
-                        wget --no-install-recommends \
+                        tcpdump --no-install-recommends \
  && echo "Installing Python Requirements ... " \
  && pip install bottle \
                 chardet \
