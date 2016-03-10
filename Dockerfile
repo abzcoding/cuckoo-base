@@ -25,6 +25,7 @@ RUN buildDeps='curl \
                libssl-dev \
                libxml2-dev \
                libxslt1-dev \
+               libyaml-dev \
                make \
                autoconf \
                automake \
