@@ -124,7 +124,7 @@ RUN buildDeps='curl \
  && python setup.py install \
  && ldconfig \
  && cd \
- && echo "Fetch and install Suricata"
+ && echo "Fetch and install Suricata" \
  && add-apt-repository ppa:oisf/suricata-beta \
  && apt-get update \
  && apt-get install -y libhtp1 suricata --no-install-recommends \
