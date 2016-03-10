@@ -157,7 +157,7 @@ RUN buildDeps='curl \
  && adduser cuckoo --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password \
  && chown -R cuckoo:cuckoo /usr/var/malheur/ \
  && chmod -R =rwX,g=rwX,o=X /usr/var/malheur/ \
- && chown cuckoo:cuckoo /etc/suricata/suricata-cuckoo.yaml \
+ && chown cuckoo:cuckoo -R /etc/suricata \
  && echo "Clean up unnecessary files" \
  && apt-get purge -y --auto-remove $buildDeps \
  && apt-get clean \
