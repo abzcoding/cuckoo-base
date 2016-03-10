@@ -9,6 +9,7 @@ ENV LIBVIRT 1.3.1
 WORKDIR /tmp/docker/build
 
 RUN buildDeps='curl \
+               g++ \
                libboost-all-dev \
                libconfig-dev \
                libcurl4-openssl-dev \
