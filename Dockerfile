@@ -15,7 +15,7 @@ RUN buildDeps='libboost-all-dev \
                libdevmapper-dev \
                libffi-dev \
                libjansson-dev \
-               libjpeg8-dev \
+               libjpeg62-turbo-dev \
                libmagic-dev \
                libnl-3-dev \
                libnl-route-3-dev \
