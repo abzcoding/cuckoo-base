@@ -46,6 +46,7 @@ RUN buildDeps='curl \
  && set -x \
  && apt-get update -qq \
  && apt-get install -yq $buildDeps \
+                        cron \
                         adduser \
                         apt-utils \
                         git-core \
@@ -150,6 +151,7 @@ RUN buildDeps='curl \
  && git clone https://github.com/seanthegeek/etupdate.git \
  && cp etupdate/etupdate /usr/sbin/etupdate \
  && /usr/sbin/etupdate -V \
+ && mkdir -p /var/spool/cron/crontabs \
  && echo "42 * * * * /usr/sbin/etupdate" >> /var/spool/cron/crontabs/root \
  && echo "Create Cuckoo user" \
  && adduser cuckoo --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password \
