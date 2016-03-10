@@ -125,9 +125,12 @@ RUN buildDeps='curl \
  && ldconfig \
  && cd \
  && echo "Fetch and install Suricata" \
- && add-apt-repository ppa:oisf/suricata-beta \
- && apt-get update \
- && apt-get install -y libhtp1 suricata --no-install-recommends \
+ && wget http://www.openinfosecfoundation.org/download/suricata-3.0RC3.tar.gz \
+ && tar -zxf suricata-3.0RC3.tar.gz \
+ && cd suricata-3.0RC3 \
+ && ./configure --enable-nfqueue --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+ && make \
+ && make install \
  && cd \
  && echo "Install the PyV8 JavaScript engine, used for analyzing malicious JavaScript.." \
  && svn checkout http://pyv8.googlecode.com/svn/trunk/ pyv8-read-only \
