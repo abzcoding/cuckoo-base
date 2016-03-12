@@ -1,10 +1,10 @@
-FROM debian:latest
+FROM alpine:latest
+
 MAINTAINER Abouzar Parvan <abzcoding@gmail.com>
 
 ENV YARA 3.4.0
 ENV SSDEEP ssdeep-2.13
 ENV VOLATILITY 2.5
-ENV LIBVIRT 1.3.1
 
 WORKDIR /tmp/docker/build
 
@@ -42,14 +42,16 @@ RUN buildDeps='curl \
                wget \
                zlib1g-dev' \
  && set -x \
- && apt-get update -qq \
- && apt-get install -yq $buildDeps \
+ && apk add --update    $buildDeps \
                         cron \
                         libtool \
                         adduser \
                         apt-utils \
                         git-core \
                         pkg-config \
+                        jansson \
+                        py-libvirt \
+                        libvirt \
                         python \
                         software-properties-common \
                         sudo \
@@ -82,15 +84,6 @@ RUN buildDeps='curl \
  && python setup.py build \
  && python setup.py install \
  && cd \
- && echo "Build and install Jansson" \
- && git clone https://github.com/akheron/jansson \
- && cd jansson \
- && autoreconf -vi --force \
- && ./configure \
- && make \
- && make check \
- && make install \
- && cd \
  && echo "Build and install ssdeep, Install pydeep, which is used to generate fuzzy hashes " \
  && wget http://www.mirrorservice.org/sites/dl.sourceforge.net/pub/sourceforge/s/ss/ssdeep/$SSDEEP/$SSDEEP.tar.gz \
  && tar xzf $SSDEEP.tar.gz \
@@ -119,20 +112,6 @@ RUN buildDeps='curl \
  && python setup.py build \
  && python setup.py install \
  && cd \
- && echo "Build and install libvirt with ESX driver" \
- && wget http://libvirt.org/sources/libvirt-$LIBVIRT.tar.gz \
- && tar xzf libvirt-$LIBVIRT.tar.gz \
- && cd libvirt-$LIBVIRT \
- && ./configure --with-esx \
- && make \
- && make install \
- && git clone git://libvirt.org/libvirt-python.git \
- && cd libvirt-python \
- && git checkout -b v$LIBVIRT tags/v$LIBVIRT \
- && python setup.py build \
- && python setup.py install \
- && ldconfig \
- && cd \
  && echo "Fetch and install Suricata" \
  && wget http://www.openinfosecfoundation.org/download/suricata-3.0RC3.tar.gz \
  && tar -zxf suricata-3.0RC3.tar.gz \
@@ -159,9 +138,8 @@ RUN buildDeps='curl \
  && chmod -R =rwX,g=rwX,o=X /usr/var/malheur/ \
  && chown cuckoo:cuckoo -R /etc/suricata \
  && echo "Clean up unnecessary files" \
- && apt-get purge -y --auto-remove $buildDeps \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+ && apk del $buildDeps \
+ && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
 # Configure Suricata to capture any file found over HTTP
 COPY suricata/rules/cuckoo.rules /etc/suricata/rules/cuckoo.rules
